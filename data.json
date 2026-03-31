@@ -1,10 +1,16 @@
 {
   "publishedAt": "2026-03-31T02:38:26.928Z",
+  "categories": [
+    "易学会",
+    "基本熟练",
+    "学习中",
+    "未学习"
+  ],
   "algorithms": [
     {
       "id": "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
       "name": "没马桶，连色",
-      "category": "OLL",
+      "category": "未学习",
       "pattern": "简单",
       "algorithm": "r U R' U R U2 r'",
       "visualPattern": [
@@ -51,7 +57,7 @@
     {
       "id": "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
       "name": "小鱼 OLL",
-      "category": "OLL",
+      "category": "未学习",
       "pattern": "顶面只剩一个角朝上，正面看像一条小鱼。",
       "algorithm": "R U R' U R U2 R'",
       "visualPattern": [
@@ -99,7 +105,7 @@
     {
       "id": "29a70d0b-ea30-44c0-ab57-544ae1815e1a",
       "name": "T OLL",
-      "category": "OLL",
+      "category": "未学习",
       "pattern": "正面像一个 T 形，常用于两步顶层。",
       "algorithm": "R U R' U' R' F R F'",
       "visualPattern": [

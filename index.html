@@ -15,182 +15,181 @@
 
   <main class="shell">
     <section class="hero">
-      <div>
-        <p class="eyebrow">CubeMate</p>
-        <h1>魔方顶层练习网站原型</h1>
-        <p class="hero-copy">
-          把顶层公式整理起来，给朋友布置练习任务，再用打卡记录每天完成了几把。
-          所有数据都会保存在当前浏览器里，适合先快速开始做原型。
-        </p>
-      </div>
-      <div class="hero-stats">
-        <article>
-          <span id="algorithmCount">0</span>
-          <strong>顶层公式</strong>
-        </article>
-        <article>
-          <span id="taskCount">0</span>
-          <strong>练习任务</strong>
-        </article>
-        <article>
-          <span id="completionRate">0%</span>
-          <strong>平均进度</strong>
-        </article>
+      <div class="hero-brand">
+        <h1>CubeMate</h1>
+        <div class="hero-subline">
+          <p class="hero-tagline">个人魔方公式练习网站</p>
+          <p class="hero-signature">By Owen Sun</p>
+        </div>
       </div>
     </section>
 
-    <section class="grid">
-      <article class="panel">
-        <div class="panel-head">
-          <div>
-            <p class="section-kicker">公式库</p>
-            <h2>顶层案例</h2>
-          </div>
-          <label class="search">
-            <span>搜索</span>
-            <input id="searchInput" type="search" placeholder="输入案例名 / 公式 / 标签">
-          </label>
-        </div>
-        <div class="toolbar">
-          <button class="ghost-button active" data-filter="all">全部</button>
-          <button class="ghost-button" data-filter="OLL">OLL</button>
-          <button class="ghost-button" data-filter="PLL">PLL</button>
-          <button class="ghost-button" data-filter="自定义">自定义</button>
-        </div>
-        <div id="algorithmList" class="algorithm-list"></div>
-      </article>
+    <nav class="tab-bar" aria-label="主要功能">
+      <button type="button" class="tab-button active" data-tab="practice">练习中心</button>
+      <button type="button" class="tab-button" data-tab="algorithms">公式库</button>
+    </nav>
 
-      <article class="panel accent-panel">
-        <div class="panel-head">
-          <div>
-            <p id="algorithmFormKicker" class="section-kicker">新增内容</p>
-            <h2 id="algorithmFormTitle">录入顶层公式</h2>
-          </div>
-        </div>
-        <form id="algorithmForm" class="stack-form">
-          <label>
-            案例名称
-            <input name="name" required placeholder="例如：小鱼 / T OLL / Aa PLL">
-          </label>
-          <label>
-            分类
-            <select name="category">
-              <option value="OLL">OLL</option>
-              <option value="PLL">PLL</option>
-              <option value="自定义">自定义</option>
-            </select>
-          </label>
-          <label>
-            顶层情况描述
-            <textarea name="pattern" rows="3" placeholder="例如：顶面一个十字，正面像小鱼朝左"></textarea>
-          </label>
-          <div class="pattern-editor-block">
-            <div class="pattern-editor-head">
-              <div>
-                <span class="pattern-editor-title">OLL 图形编辑</span>
-                <p class="pattern-editor-copy">默认全灰。点一下块会变黄，再点一次会恢复灰色。</p>
-              </div>
-              <div class="pattern-editor-actions">
-                <button id="fillPatternButton" type="button" class="ghost-button">全黄</button>
-                <button id="clearPatternButton" type="button" class="ghost-button">清空</button>
-              </div>
+    <section id="algorithmsTab" class="tab-panel" data-tab-panel="algorithms">
+      <section class="grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title-accent">公式库</h2>
             </div>
-            <div id="patternEditor" class="cube-pattern cube-pattern-editor" aria-label="OLL 图形编辑器"></div>
+            <label class="search">
+              <span>搜索</span>
+              <input id="searchInput" type="search" placeholder="输入案例名 / 公式 / 标签">
+            </label>
           </div>
-          <label>
-            公式
-            <textarea name="algorithm" rows="3" required placeholder="例如：R U R' U R U2 R'"></textarea>
-          </label>
-          <label>
-            标签
-            <input name="tags" placeholder="例如：2-look, 初学者, 常用">
-          </label>
-          <div class="form-actions">
-            <button id="submitAlgorithmButton" type="submit" class="primary-button">保存公式</button>
-            <button id="cancelEditButton" type="button" class="ghost-button hidden">取消编辑</button>
+          <div class="toolbar">
+            <button class="ghost-button active" data-filter="all">全部</button>
+            <button class="ghost-button" data-filter="OLL">OLL</button>
+            <button class="ghost-button" data-filter="PLL">PLL</button>
+            <button class="ghost-button" data-filter="自定义">自定义</button>
           </div>
-        </form>
-      </article>
-    </section>
+          <div id="algorithmList" class="algorithm-list"></div>
+        </article>
 
-    <section class="grid task-grid">
-      <article class="panel">
-        <div class="panel-head">
-          <div>
-            <p class="section-kicker">任务中心</p>
-            <h2>给朋友布置练习</h2>
-          </div>
-        </div>
-        <form id="taskForm" class="stack-form">
-          <label>
-            朋友名字
-            <input name="friendName" required placeholder="例如：小明">
-          </label>
-          <label>
-            日期
-            <input name="date" type="date" required>
-          </label>
-          <label>
-            训练重点
-            <input name="focus" placeholder="例如：小鱼 + T OLL">
-          </label>
-          <div class="assignment-block">
-            <div class="panel-head compact-head">
-              <div>
-                <p class="section-kicker">选择公式</p>
-                <h3>每条练习多少次</h3>
-              </div>
+        <article class="panel accent-panel">
+          <div class="panel-head">
+            <div>
+              <h2 id="algorithmFormTitle" class="panel-title-accent">录入公式</h2>
             </div>
-            <div id="taskAssignmentList" class="assignment-list"></div>
           </div>
-          <button type="submit" class="primary-button">创建任务</button>
-        </form>
-      </article>
+          <form id="algorithmForm" class="stack-form">
+            <label>
+              案例名称
+              <input name="name" required placeholder="例如：小鱼 / T OLL / Aa PLL">
+            </label>
+            <label>
+              分类
+              <select id="categorySelect" name="category"></select>
+            </label>
+            <div class="pattern-editor-block">
+              <div class="pattern-editor-head">
+                <div>
+                  <span class="pattern-editor-title">OLL 图形编辑</span>
+                  <p class="pattern-editor-copy">默认全灰。点一下块会变黄，再点一次会恢复灰色。</p>
+                </div>
+                <div class="pattern-editor-actions">
+                  <button id="fillPatternButton" type="button" class="ghost-button">全黄</button>
+                  <button id="clearPatternButton" type="button" class="ghost-button">清空</button>
+                </div>
+              </div>
+              <div id="patternEditor" class="cube-pattern cube-pattern-editor" aria-label="OLL 图形编辑器"></div>
+            </div>
+            <label>
+              公式
+              <textarea name="algorithm" rows="3" required placeholder="例如：R U R' U R U2 R'"></textarea>
+            </label>
+            <label>
+              标签
+              <select id="tagSelect" name="tag"></select>
+            </label>
+            <label>
+              备注
+              <textarea name="pattern" rows="3" placeholder="例如：顶面一个十字，正面像小鱼朝左"></textarea>
+            </label>
+            <div class="form-actions">
+              <button id="submitAlgorithmButton" type="submit" class="primary-button">保存公式</button>
+              <button id="cancelEditButton" type="button" class="ghost-button hidden">取消编辑</button>
+            </div>
+            <section class="category-manager">
+              <div class="category-manager-head">
+                <span class="pattern-editor-title">分类管理</span>
+                <p class="pattern-editor-copy">可以新增、重命名或删除分类。</p>
+              </div>
+              <div class="category-create-row">
+                <input id="newCategoryInput" type="text" placeholder="输入新的分类名称">
+                <button id="addCategoryButton" type="button" class="ghost-button">新增分类</button>
+              </div>
+              <div id="categoryManagerList" class="category-manager-list"></div>
+            </section>
+          </form>
+        </article>
+      </section>
+    </section>
 
-      <article class="panel">
+    <section id="practiceTab" class="tab-panel active" data-tab-panel="practice">
+      <section class="grid task-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">任务中心</p>
+              <h2>布置练习</h2>
+            </div>
+          </div>
+          <form id="taskForm" class="stack-form">
+            <label>
+              练习名
+              <input name="friendName" required placeholder="">
+            </label>
+            <label>
+              日期
+              <input name="date" type="date" required>
+            </label>
+            <label>
+              训练重点
+              <input name="focus" placeholder="">
+            </label>
+            <div class="assignment-block">
+              <div class="panel-head compact-head">
+                <div>
+                  <h3>选择公式</h3>
+                </div>
+              </div>
+              <div id="taskAssignmentList" class="assignment-list"></div>
+              <label>
+                每条练习次数
+                <input id="assignmentRepeatInput" name="assignmentRepeat" type="number" min="1" value="1" required>
+              </label>
+            </div>
+            <button type="submit" class="primary-button">创建任务</button>
+          </form>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">打卡区</p>
+              <h2>任务进度</h2>
+            </div>
+          </div>
+          <div id="taskList" class="task-list"></div>
+        </article>
+      </section>
+
+      <section class="panel export-panel">
         <div class="panel-head">
           <div>
-            <p class="section-kicker">打卡区</p>
-            <h2>任务进度</h2>
+            <p class="section-kicker">数据管理</p>
+            <h2>备份和分享</h2>
           </div>
         </div>
-        <div id="taskList" class="task-list"></div>
-      </article>
-    </section>
-
-    <section class="panel export-panel">
-      <div class="panel-head">
-        <div>
-          <p class="section-kicker">数据管理</p>
-          <h2>备份和分享</h2>
+        <div class="export-actions">
+          <button id="exportButton" class="ghost-button strong">导出数据 JSON</button>
+          <button id="publishExportButton" class="ghost-button strong">导出发布版 data.json</button>
+          <label class="import-button">
+            导入数据 JSON
+            <input id="importInput" type="file" accept="application/json">
+          </label>
+          <button id="restorePublishedButton" class="ghost-button">恢复线上发布版本</button>
         </div>
-      </div>
-      <div class="export-actions">
-        <button id="exportButton" class="ghost-button strong">导出数据 JSON</button>
-        <button id="publishExportButton" class="ghost-button strong">导出发布版 data.json</button>
-        <label class="import-button">
-          导入数据 JSON
-          <input id="importInput" type="file" accept="application/json">
-        </label>
-        <button id="restorePublishedButton" class="ghost-button">恢复线上发布版本</button>
-      </div>
-      <p class="hint">
-        这个版本支持两种数据：浏览器本地修改，以及仓库里的发布数据文件 `data.json`。你本地改完后，可以导出发布版文件并替换仓库里的 `data.json`，再 push 到 GitHub。
-      </p>
-    </section>
+      </section>
 
-    <section id="practicePanel" class="panel practice-panel hidden">
-      <div class="panel-head">
-        <div>
-          <p class="section-kicker">练习模式</p>
-          <h2 id="practiceTitle">开始练习</h2>
-          <p id="practiceMeta" class="hint"></p>
+      <section id="practicePanel" class="panel practice-panel hidden">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">练习区域</p>
+            <h2 id="practiceTitle">开始练习</h2>
+            <p id="practiceMeta" class="hint"></p>
+          </div>
+          <button id="closePracticeButton" type="button" class="ghost-button">关闭练习</button>
         </div>
-        <button id="closePracticeButton" type="button" class="ghost-button">关闭练习</button>
-      </div>
-      <div id="practiceContent" class="practice-content">
-        <div class="empty-state">先从任务卡片里点击“开始练习”。</div>
-      </div>
+        <div id="practiceContent" class="practice-content">
+          <div class="empty-state">先从任务进度里点击“开始练习”。</div>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -208,6 +207,10 @@
         <button class="ghost-button edit-algorithm">编辑</button>
         <button class="danger-link delete-algorithm">删除</button>
       </div>
+      <div class="sort-controls">
+        <button class="sort-arrow sort-up" aria-label="上移公式">↑</button>
+        <button class="sort-arrow sort-down" aria-label="下移公式">↓</button>
+      </div>
     </article>
   </template>
 
@@ -224,10 +227,13 @@
         <div class="progress-value"></div>
       </div>
       <p class="task-focus"></p>
-      <div class="task-assignment-summary"></div>
+      <p class="task-repeat"></p>
+      <details class="task-assignment-details">
+        <summary class="task-assignment-toggle">查看练习公式</summary>
+        <div class="task-assignment-summary"></div>
+      </details>
       <div class="task-actions">
         <button class="primary-button task-practice">开始练习</button>
-        <button class="ghost-button task-share">复制任务文案</button>
         <button class="danger-link task-delete">删除</button>
       </div>
     </article>

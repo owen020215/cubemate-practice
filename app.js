@@ -1,5 +1,6 @@
 const STORAGE_KEY = "cubemate-data-v1";
 const PUBLISHED_DATA_URL = "./data.json";
+const DEFAULT_CATEGORIES = ["已学会", "基本熟练", "学习中", "未学习"];
 const PATTERN_TEMPLATE = [
   [0, 1, 1, 1, 0],
   [1, 1, 1, 1, 1],
@@ -13,10 +14,10 @@ const seedAlgorithms = [
   {
     id: crypto.randomUUID(),
     name: "小鱼 OLL",
-    category: "OLL",
+    category: "未学习",
     pattern: "顶面只剩一个角朝上，正面看像一条小鱼。",
     algorithm: "R U R' U R U2 R'",
-    tags: ["2-look", "初学者"],
+    tags: ["OLL", "2-look", "初学者"],
     visualPattern: [
       [0, 0, 1, 0, 0],
       [0, 0, 1, 0, 0],
@@ -28,10 +29,10 @@ const seedAlgorithms = [
   {
     id: crypto.randomUUID(),
     name: "反小鱼 OLL",
-    category: "OLL",
+    category: "未学习",
     pattern: "和小鱼相反方向，常见于顶层定向第二种情况。",
     algorithm: "R U2 R' U' R U' R'",
-    tags: ["2-look", "初学者"],
+    tags: ["OLL", "2-look", "初学者"],
     visualPattern: [
       [0, 0, 1, 0, 0],
       [0, 1, 1, 1, 0],
@@ -43,10 +44,10 @@ const seedAlgorithms = [
   {
     id: crypto.randomUUID(),
     name: "T OLL",
-    category: "OLL",
+    category: "未学习",
     pattern: "正面像一个 T 形，常用于两步顶层。",
     algorithm: "r U R' U' r' F R F'",
-    tags: ["常用", "进阶"],
+    tags: ["OLL", "常用", "进阶"],
     visualPattern: [
       [0, 0, 1, 0, 0],
       [0, 1, 1, 1, 0],
@@ -58,7 +59,7 @@ const seedAlgorithms = [
   {
     id: crypto.randomUUID(),
     name: "Aa PLL",
-    category: "PLL",
+    category: "未学习",
     pattern: "顶层角块需要三循环，边块已对好。",
     algorithm: "x R' U R' D2 R U' R' D2 R2 x'",
     tags: ["PLL", "角块"],
@@ -73,7 +74,7 @@ const seedAlgorithms = [
   {
     id: crypto.randomUUID(),
     name: "Ua PLL",
-    category: "PLL",
+    category: "未学习",
     pattern: "顶层三条边顺时针循环。",
     algorithm: "R U' R U R U R U' R' U' R2",
     tags: ["PLL", "边块"],
@@ -94,6 +95,11 @@ const state = createEmptyState();
 const algorithmList = document.getElementById("algorithmList");
 const taskList = document.getElementById("taskList");
 const algorithmForm = document.getElementById("algorithmForm");
+const categorySelect = document.getElementById("categorySelect");
+const tagSelect = document.getElementById("tagSelect");
+const categoryManagerList = document.getElementById("categoryManagerList");
+const newCategoryInput = document.getElementById("newCategoryInput");
+const addCategoryButton = document.getElementById("addCategoryButton");
 const taskForm = document.getElementById("taskForm");
 const searchInput = document.getElementById("searchInput");
 const exportButton = document.getElementById("exportButton");
@@ -106,15 +112,17 @@ const patternEditor = document.getElementById("patternEditor");
 const clearPatternButton = document.getElementById("clearPatternButton");
 const fillPatternButton = document.getElementById("fillPatternButton");
 const taskAssignmentList = document.getElementById("taskAssignmentList");
+const assignmentRepeatInput = document.getElementById("assignmentRepeatInput");
 const cancelEditButton = document.getElementById("cancelEditButton");
 const submitAlgorithmButton = document.getElementById("submitAlgorithmButton");
-const algorithmFormKicker = document.getElementById("algorithmFormKicker");
 const algorithmFormTitle = document.getElementById("algorithmFormTitle");
 const practicePanel = document.getElementById("practicePanel");
 const practiceTitle = document.getElementById("practiceTitle");
 const practiceMeta = document.getElementById("practiceMeta");
 const practiceContent = document.getElementById("practiceContent");
 const closePracticeButton = document.getElementById("closePracticeButton");
+const tabButtons = document.querySelectorAll("[data-tab]");
+const tabPanels = document.querySelectorAll("[data-tab-panel]");
 const countNodes = {
   algorithm: document.getElementById("algorithmCount"),
   task: document.getElementById("taskCount"),
@@ -123,21 +131,36 @@ const countNodes = {
 let draftPattern = clonePattern(DEFAULT_PATTERN);
 let editingAlgorithmId = null;
 let activePracticeTaskId = null;
-let practiceRevealSolution = false;
 let publishedSnapshot = null;
+state.activeTab = "practice";
+state.openAssignmentCategories = [];
 
 taskForm.elements.date.value = today;
 buildPatternEditor();
 renderTaskAssignmentSelector();
 
-document.querySelectorAll("[data-filter]").forEach((button) => {
+tabButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    state.algorithmFilter = button.dataset.filter;
-    document.querySelectorAll("[data-filter]").forEach((node) => {
-      node.classList.toggle("active", node === button);
-    });
-    renderAlgorithms();
+    state.activeTab = button.dataset.tab;
+    renderTabs();
   });
+});
+
+addCategoryButton.addEventListener("click", () => {
+  const name = newCategoryInput.value.trim();
+  if (!name) {
+    return;
+  }
+  if (state.categories.includes(name)) {
+    window.alert("这个分类已经存在。");
+    return;
+  }
+  state.categories.push(name);
+  state.categories.sort((a, b) => a.localeCompare(b, "zh-CN"));
+  categorySelect.value = name;
+  newCategoryInput.value = "";
+  persist();
+  render();
 });
 
 algorithmForm.addEventListener("submit", (event) => {
@@ -150,10 +173,7 @@ algorithmForm.addEventListener("submit", (event) => {
     pattern: String(formData.get("pattern")).trim(),
     algorithm: String(formData.get("algorithm")).trim(),
     visualPattern: clonePattern(draftPattern),
-    tags: String(formData.get("tags"))
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean)
+    tags: [String(formData.get("tag")).trim() || "未学习"]
   });
 
   if (editingAlgorithmId) {
@@ -172,21 +192,24 @@ algorithmForm.addEventListener("submit", (event) => {
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const formData = new FormData(taskForm);
-  const assignments = Array.from(taskAssignmentList.querySelectorAll("[data-algorithm-id]"))
+  const repeatCount = Number(assignmentRepeatInput.value || 0);
+  const assignments = Array.from(taskAssignmentList.querySelectorAll("[data-algorithm-id]:checked"))
     .map((input) => ({
       algorithmId: input.dataset.algorithmId,
-      repetitions: Number(input.value || 0)
-    }))
-    .filter((item) => item.repetitions > 0);
+      repetitions: repeatCount
+    }));
 
   if (!assignments.length) {
-    window.alert("请至少选择一条公式，并设置练习次数。");
+    window.alert("请至少勾选一条公式。");
     return;
   }
 
-  const queue = shuffleArray(
-    assignments.flatMap((item) => Array.from({ length: item.repetitions }, () => item.algorithmId))
-  );
+  if (repeatCount < 1) {
+    window.alert("请填写每条公式练习次数。");
+    return;
+  }
+
+  const queue = buildPracticeQueue(assignments);
   const target = assignments.reduce((sum, item) => sum + item.repetitions, 0);
   const task = {
     id: crypto.randomUUID(),
@@ -274,12 +297,6 @@ cancelEditButton.addEventListener("click", () => {
   resetAlgorithmForm();
 });
 
-closePracticeButton.addEventListener("click", () => {
-  activePracticeTaskId = null;
-  practiceRevealSolution = false;
-  renderPracticePanel();
-});
-
 restorePublishedButton.addEventListener("click", () => {
   if (!publishedSnapshot) {
     window.alert("当前没有可恢复的线上发布版本。");
@@ -287,12 +304,15 @@ restorePublishedButton.addEventListener("click", () => {
   }
 
   hydrateState(structuredClone(publishedSnapshot));
-  activePracticeTaskId = null;
-  practiceRevealSolution = false;
   resetAlgorithmForm();
   persist();
   render();
   window.alert("已恢复到当前仓库里的发布版本。");
+});
+
+closePracticeButton.addEventListener("click", () => {
+  activePracticeTaskId = null;
+  renderPracticePanel();
 });
 
 function loadLocalState() {
@@ -314,11 +334,130 @@ function persist() {
 }
 
 function render() {
+  renderTabs();
+  renderCategoryControls();
   renderAlgorithms();
   renderTaskAssignmentSelector();
   renderTasks();
   renderStats();
   renderPracticePanel();
+}
+
+function renderCategoryControls() {
+  renderCategorySelect();
+  renderTagSelect();
+  renderCategoryManager();
+  renderFilterToolbar();
+}
+
+function renderCategorySelect() {
+  const selectedValue = editingAlgorithmId
+    ? algorithmForm.elements.category.value
+    : categorySelect.value || state.categories[0];
+  categorySelect.innerHTML = "";
+
+  state.categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categorySelect.append(option);
+  });
+
+  if (state.categories.includes(selectedValue)) {
+    categorySelect.value = selectedValue;
+  } else {
+    categorySelect.value = state.categories[0] || "";
+  }
+}
+
+function renderCategoryManager() {
+  categoryManagerList.innerHTML = "";
+
+  state.categories.forEach((category) => {
+    const row = document.createElement("div");
+    row.className = "category-item";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = category;
+    input.setAttribute("aria-label", `${category} 分类名称`);
+
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.className = "ghost-button";
+    saveButton.textContent = "保存";
+    saveButton.addEventListener("click", () => {
+      renameCategory(category, input.value.trim());
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "danger-link";
+    deleteButton.textContent = "删除";
+    deleteButton.addEventListener("click", () => {
+      deleteCategory(category);
+    });
+
+    row.append(input, saveButton, deleteButton);
+    categoryManagerList.append(row);
+  });
+}
+
+function renderTagSelect() {
+  const selectedValue = editingAlgorithmId
+    ? algorithmForm.elements.tag.value
+    : tagSelect.value || DEFAULT_CATEGORIES[3];
+  tagSelect.innerHTML = "";
+
+  DEFAULT_CATEGORIES.forEach((tag) => {
+    const option = document.createElement("option");
+    option.value = tag;
+    option.textContent = tag;
+    tagSelect.append(option);
+  });
+
+  if (DEFAULT_CATEGORIES.includes(selectedValue)) {
+    tagSelect.value = selectedValue;
+  } else {
+    tagSelect.value = "未学习";
+  }
+}
+
+function renderFilterToolbar() {
+  const toolbar = document.querySelector(".toolbar");
+  toolbar.innerHTML = "";
+
+  const allButton = createFilterButton("all", "全部");
+  toolbar.append(allButton);
+
+  state.categories.forEach((category) => {
+    toolbar.append(createFilterButton(category, category));
+  });
+}
+
+function createFilterButton(value, label) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ghost-button";
+  button.dataset.filter = value;
+  button.textContent = label;
+  button.classList.toggle("active", state.algorithmFilter === value);
+  button.addEventListener("click", () => {
+    state.algorithmFilter = value;
+    renderAlgorithms();
+    renderFilterToolbar();
+  });
+  return button;
+}
+
+function renderTabs() {
+  tabButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.tab === state.activeTab);
+  });
+
+  tabPanels.forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.tabPanel === state.activeTab);
+  });
 }
 
 function renderAlgorithms() {
@@ -342,14 +481,30 @@ function renderAlgorithms() {
 
   filtered.forEach((item) => {
     const node = algorithmTemplate.content.firstElementChild.cloneNode(true);
-    node.querySelector(".category-pill").textContent = item.category;
-    node.querySelector(".tag-pill").textContent = item.tags?.[0] || "未分类标签";
+    const categoryPill = node.querySelector(".category-pill");
+    categoryPill.textContent = item.category;
+    categoryPill.dataset.category = item.category;
+    const tagPill = node.querySelector(".tag-pill");
+    const tagValue = item.tags?.[0] || "未学习";
+    tagPill.textContent = tagValue;
+    tagPill.dataset.tag = tagValue;
     node.querySelector(".algorithm-visual").append(createPatternElement(item.visualPattern));
     node.querySelector(".algorithm-name").textContent = item.name;
-    node.querySelector(".algorithm-pattern").textContent = item.pattern || "暂时没有补充案例描述。";
+    const patternNode = node.querySelector(".algorithm-pattern");
+    if (item.pattern) {
+      patternNode.textContent = item.pattern;
+    } else {
+      patternNode.remove();
+    }
     node.querySelector(".algorithm-formula").replaceWith(createFormulaStack(item.algorithm));
     node.querySelector(".edit-algorithm").addEventListener("click", () => {
       startEditingAlgorithm(item);
+    });
+    node.querySelector(".sort-up").addEventListener("click", () => {
+      moveAlgorithm(item.id, -1);
+    });
+    node.querySelector(".sort-down").addEventListener("click", () => {
+      moveAlgorithm(item.id, 1);
     });
     node.querySelector(".delete-algorithm").addEventListener("click", () => {
       state.algorithms = state.algorithms.filter((entry) => entry.id !== item.id);
@@ -380,12 +535,12 @@ function renderTasks() {
     node.querySelector(".task-focus").textContent = task.focus
       ? `训练重点：${task.focus}`
       : "训练重点：未设置";
+    node.querySelector(".task-repeat").textContent = getRepeatSummary(task);
     node.querySelector(".progress-value").style.width = `${progress}%`;
     node.querySelector(".task-assignment-summary").append(renderAssignmentSummary(task));
 
     node.querySelector(".task-practice").addEventListener("click", () => {
       activePracticeTaskId = task.id;
-      practiceRevealSolution = false;
       renderPracticePanel();
       practicePanel.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -399,29 +554,15 @@ function renderTasks() {
       render();
     });
 
-    node.querySelector(".task-share").addEventListener("click", async () => {
-      const message =
-        `魔方练习任务\n` +
-        `朋友：${task.friendName}\n` +
-        `日期：${task.date}\n` +
-        `目标：${task.target} 次\n` +
-        `当前进度：${task.completed}/${task.target}\n` +
-        `训练重点：${task.focus || "未设置"}\n` +
-        `练习公式：${formatAssignmentText(task)}`;
-
-      try {
-        await navigator.clipboard.writeText(message);
-        window.alert("任务文案已复制");
-      } catch {
-        window.alert(message);
-      }
-    });
-
     taskList.append(node);
   });
 }
 
 function renderStats() {
+  if (!countNodes.algorithm || !countNodes.task || !countNodes.completion) {
+    return;
+  }
+
   countNodes.algorithm.textContent = String(state.algorithms.length);
   countNodes.task.textContent = String(state.tasks.length);
 
@@ -436,11 +577,10 @@ function renderStats() {
 }
 
 function renderTaskAssignmentSelector() {
-  const currentValues = new Map(
-    Array.from(taskAssignmentList.querySelectorAll("[data-algorithm-id]")).map((input) => [
-      input.dataset.algorithmId,
-      input.value
-    ])
+  const checkedValues = new Set(
+    Array.from(taskAssignmentList.querySelectorAll("[data-algorithm-id]:checked")).map((input) =>
+      input.dataset.algorithmId
+    )
   );
   taskAssignmentList.innerHTML = "";
 
@@ -449,20 +589,83 @@ function renderTaskAssignmentSelector() {
     return;
   }
 
-  state.algorithms.forEach((algorithm) => {
-    const row = document.createElement("label");
-    row.className = "assignment-row";
-    row.innerHTML =
-      `<div><strong>${escapeHtml(algorithm.name)}</strong><span>${escapeHtml(algorithm.category)}</span></div>`;
+  state.categories.forEach((category) => {
+    const algorithms = state.algorithms.filter((algorithm) => algorithm.category === category);
+    if (!algorithms.length) {
+      return;
+    }
 
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = "0";
-    input.value = currentValues.get(algorithm.id) || "0";
-    input.dataset.algorithmId = algorithm.id;
-    input.setAttribute("aria-label", `${algorithm.name} 练习次数`);
-    row.append(input);
-    taskAssignmentList.append(row);
+    const group = document.createElement("section");
+    group.className = "assignment-group";
+    group.classList.toggle("open", state.openAssignmentCategories.includes(category));
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "assignment-group-toggle";
+    toggle.addEventListener("click", () => {
+      toggleAssignmentCategory(category);
+    });
+
+    const meta = document.createElement("div");
+    meta.className = "assignment-group-meta";
+    const badge = document.createElement("span");
+    badge.className = "category-badge";
+    badge.textContent = category;
+    const count = document.createElement("span");
+    count.className = "assignment-group-count";
+    count.textContent = `${algorithms.length} 条公式`;
+    meta.append(badge, count);
+
+    const actions = document.createElement("div");
+    actions.className = "assignment-group-actions";
+
+    const selectAllButton = document.createElement("button");
+    selectAllButton.type = "button";
+    selectAllButton.className = "assignment-group-select-all";
+    selectAllButton.textContent = "全选此分类";
+    selectAllButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      selectAssignmentCategory(category);
+    });
+
+    const chevron = document.createElement("span");
+    chevron.className = "assignment-group-chevron";
+    chevron.textContent = "▾";
+    actions.append(selectAllButton, chevron);
+    toggle.append(meta, actions);
+
+    const body = document.createElement("div");
+    body.className = "assignment-group-body";
+
+    algorithms.forEach((algorithm) => {
+      const row = document.createElement("label");
+      row.className = "assignment-row";
+
+      const info = document.createElement("div");
+      info.className = "assignment-info";
+
+      const thumb = document.createElement("div");
+      thumb.className = "assignment-thumb";
+      thumb.append(createPatternElement(algorithm.visualPattern));
+
+      const textWrap = document.createElement("div");
+      textWrap.innerHTML =
+        `<strong>${escapeHtml(algorithm.name)}</strong><span>${escapeHtml(algorithm.category)}</span>`;
+      info.append(thumb, textWrap);
+
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "assignment-check";
+      input.checked = checkedValues.has(algorithm.id);
+      input.dataset.algorithmId = algorithm.id;
+      input.setAttribute("aria-label", `选择 ${algorithm.name}`);
+
+      row.append(info, input);
+      body.append(row);
+    });
+
+    group.append(toggle, body);
+    taskAssignmentList.append(group);
   });
 }
 
@@ -526,23 +729,26 @@ function resetDraftPattern() {
 function resetAlgorithmForm() {
   editingAlgorithmId = null;
   algorithmForm.reset();
+  algorithmForm.elements.category.value = state.categories[0] || "";
+  algorithmForm.elements.tag.value = "未学习";
   resetDraftPattern();
   setAlgorithmFormMode();
 }
 
 function resetTaskAssignmentSelector() {
-  taskAssignmentList.querySelectorAll("input").forEach((input) => {
-    input.value = "0";
+  taskAssignmentList.querySelectorAll("[data-algorithm-id]").forEach((input) => {
+    input.checked = false;
   });
+  assignmentRepeatInput.value = "1";
 }
 
 function startEditingAlgorithm(item) {
   editingAlgorithmId = item.id;
   algorithmForm.elements.name.value = item.name || "";
-  algorithmForm.elements.category.value = item.category || "OLL";
+  algorithmForm.elements.category.value = item.category || state.categories[0] || "";
   algorithmForm.elements.pattern.value = item.pattern || "";
   algorithmForm.elements.algorithm.value = item.algorithm || "";
-  algorithmForm.elements.tags.value = Array.isArray(item.tags) ? item.tags.join(", ") : "";
+  algorithmForm.elements.tag.value = Array.isArray(item.tags) ? item.tags[0] || "未学习" : "未学习";
   draftPattern = normalizePattern(item.visualPattern);
   syncPatternEditor();
   setAlgorithmFormMode();
@@ -551,8 +757,7 @@ function startEditingAlgorithm(item) {
 
 function setAlgorithmFormMode() {
   const isEditing = Boolean(editingAlgorithmId);
-  algorithmFormKicker.textContent = isEditing ? "编辑内容" : "新增内容";
-  algorithmFormTitle.textContent = isEditing ? "编辑顶层公式" : "录入顶层公式";
+  algorithmFormTitle.textContent = isEditing ? "编辑公式" : "录入公式";
   submitAlgorithmButton.textContent = isEditing ? "保存修改" : "保存公式";
   cancelEditButton.classList.toggle("hidden", !isEditing);
 }
@@ -588,7 +793,7 @@ function renderAssignmentSummary(task) {
     const algorithm = state.algorithms.find((item) => item.id === assignment.algorithmId);
     const chip = document.createElement("span");
     chip.className = "assignment-chip";
-    chip.textContent = `${algorithm?.name || "已删除公式"} × ${assignment.repetitions}`;
+    chip.textContent = `${algorithm?.name || "已删除公式"}`;
     wrap.append(chip);
   });
 
@@ -609,17 +814,17 @@ function renderPracticePanel() {
     practicePanel.classList.add("hidden");
     practiceTitle.textContent = "开始练习";
     practiceMeta.textContent = "";
-    practiceContent.innerHTML = '<div class="empty-state">先从任务卡片里点击“开始练习”。</div>';
+    practiceContent.innerHTML = '<div class="empty-state">先从任务进度里点击“开始练习”。</div>';
     return;
   }
 
   practicePanel.classList.remove("hidden");
-  practiceTitle.textContent = `${task.friendName} 的练习任务`;
-  practiceMeta.textContent = `${task.date} · 已完成 ${task.completed}/${task.target}${task.needsMore ? ` · 加练 ${task.needsMore}` : ""}`;
   practiceContent.innerHTML = "";
 
   if (!task.queue?.length) {
-    practiceContent.append(emptyState("本次练习已经全部完成，可以继续创建新的任务。"));
+    practiceTitle.textContent = `${task.friendName} 已完成`;
+    practiceMeta.textContent = `${task.date} · 已完成 ${task.completed}/${task.target}`;
+    practiceContent.append(emptyState("这组练习已经全部完成。"));
     return;
   }
 
@@ -627,88 +832,184 @@ function renderPracticePanel() {
   const algorithm = state.algorithms.find((item) => item.id === currentAlgorithmId);
 
   if (!algorithm) {
-    task.queue.shift();
-    persist();
-    render();
+    practiceContent.append(emptyState("当前公式不存在，请返回检查任务。"));
     return;
   }
 
+  const currentIndex = Math.min(task.completed + 1, task.target);
+  practiceTitle.textContent = task.friendName;
+  practiceMeta.textContent = `${task.date} · 第 ${currentIndex} / ${task.target} 题 · 已完成 ${task.completed}`;
+
   const stage = document.createElement("div");
   stage.className = "practice-stage";
-  stage.append(createPatternElement(algorithm.visualPattern));
 
-  const title = document.createElement("h3");
-  title.textContent = algorithm.name;
-  stage.append(title);
+  const face = document.createElement("div");
+  face.className = "practice-card-face";
+  face.append(createPatternElement(algorithm.visualPattern));
 
-  const description = document.createElement("p");
-  description.className = "algorithm-pattern";
-  description.textContent = algorithm.pattern || "暂时没有补充案例描述。";
-  stage.append(description);
-
-  const formula = document.createElement("code");
-  formula.className = "algorithm-formula practice-algorithm";
-  formula.textContent = algorithm.algorithm;
+  const name = document.createElement("h3");
+  name.className = "practice-name";
+  name.textContent = algorithm.name;
+  face.append(name);
 
   const scramble = document.createElement("code");
   scramble.className = "algorithm-formula practice-algorithm";
   scramble.textContent = `打乱公式：${invertAlgorithm(algorithm.algorithm)}`;
-  stage.append(scramble);
+  face.append(scramble);
 
-  if (practiceRevealSolution) {
-    const solutionLabel = document.createElement("p");
-    solutionLabel.className = "formula-label";
-    solutionLabel.textContent = "参考公式";
-    stage.append(solutionLabel);
-    stage.append(formula);
+  const formula = document.createElement("code");
+  formula.className = "algorithm-formula practice-algorithm";
+  formula.textContent = `公式：${algorithm.algorithm}`;
+  face.append(formula);
+
+  if (algorithm.pattern) {
+    const note = document.createElement("p");
+    note.className = "practice-note";
+    note.textContent = `备注：${algorithm.pattern}`;
+    face.append(note);
   }
 
   const actions = document.createElement("div");
   actions.className = "practice-actions";
 
-  const successButton = document.createElement("button");
-  successButton.type = "button";
-  successButton.className = "primary-button";
-  successButton.textContent = "成功还原";
-  successButton.addEventListener("click", () => {
-    task.queue.shift();
-    task.completed += 1;
-    practiceRevealSolution = false;
-    persist();
-    render();
+  const nextButton = document.createElement("button");
+  nextButton.type = "button";
+  nextButton.className = "primary-button";
+  nextButton.textContent = "下一题";
+  nextButton.addEventListener("click", () => {
+    goToNextPracticeCard();
   });
 
-  const retryButton = document.createElement("button");
-  retryButton.type = "button";
-  retryButton.className = "ghost-button";
-  retryButton.textContent = "还需练习";
-  retryButton.addEventListener("click", () => {
-    practiceRevealSolution = true;
-    persist();
-    renderPracticePanel();
-  });
+  actions.append(nextButton);
 
-  actions.append(successButton, retryButton);
+  stage.append(face, actions);
+  practiceContent.append(stage);
+}
 
-  if (practiceRevealSolution) {
-    const nextButton = document.createElement("button");
-    nextButton.type = "button";
-    nextButton.className = "ghost-button";
-    nextButton.textContent = "加入加练并下一题";
-    nextButton.addEventListener("click", () => {
-      const algorithmId = task.queue.shift();
-      task.queue.push(algorithmId);
-      task.needsMore += 1;
-      task.queue = shuffleArray(task.queue);
-      practiceRevealSolution = false;
-      persist();
-      render();
-    });
-    actions.append(nextButton);
+function goToNextPracticeCard() {
+  if (!activePracticeTaskId) {
+    return;
   }
 
-  stage.append(actions);
-  practiceContent.append(stage);
+  state.tasks = state.tasks.map((task) => {
+    if (task.id !== activePracticeTaskId) {
+      return task;
+    }
+
+    const queue = Array.isArray(task.queue) ? [...task.queue] : [];
+    if (!queue.length) {
+      return task;
+    }
+
+    const completedAlgorithmId = queue.shift();
+    promoteNextDifferent(queue, completedAlgorithmId);
+    return {
+      ...task,
+      queue,
+      completed: Number(task.completed || 0) + 1
+    };
+  });
+
+  persist();
+  renderTasks();
+  renderPracticePanel();
+  renderStats();
+}
+
+function buildPracticeQueue(assignments) {
+  const pool = assignments.map((assignment) => ({
+    algorithmId: assignment.algorithmId,
+    remaining: assignment.repetitions
+  }));
+  const queue = [];
+  let lastAlgorithmId = null;
+
+  while (pool.some((item) => item.remaining > 0)) {
+    const candidates = pool
+      .filter((item) => item.remaining > 0)
+      .sort((a, b) => b.remaining - a.remaining);
+
+    let nextItem = candidates.find((item) => item.algorithmId !== lastAlgorithmId) || candidates[0];
+    queue.push(nextItem.algorithmId);
+    nextItem.remaining -= 1;
+    lastAlgorithmId = nextItem.algorithmId;
+  }
+
+  return queue;
+}
+
+function promoteNextDifferent(queue, previousAlgorithmId) {
+  if (!Array.isArray(queue) || queue.length <= 1) {
+    return;
+  }
+
+  if (queue[0] !== previousAlgorithmId) {
+    return;
+  }
+
+  const nextDifferentIndex = queue.findIndex((id) => id !== previousAlgorithmId);
+  if (nextDifferentIndex <= 0) {
+    return;
+  }
+
+  const [nextDifferent] = queue.splice(nextDifferentIndex, 1);
+  queue.unshift(nextDifferent);
+}
+
+function toggleAssignmentCategory(category) {
+  if (state.openAssignmentCategories.includes(category)) {
+    state.openAssignmentCategories = state.openAssignmentCategories.filter((item) => item !== category);
+  } else {
+    state.openAssignmentCategories = [...state.openAssignmentCategories, category];
+  }
+  renderTaskAssignmentSelector();
+}
+
+function selectAssignmentCategory(category) {
+  const checkedValues = new Set(
+    Array.from(taskAssignmentList.querySelectorAll("[data-algorithm-id]:checked")).map((input) =>
+      input.dataset.algorithmId
+    )
+  );
+  const categoryIds = state.algorithms
+    .filter((algorithm) => algorithm.category === category)
+    .map((algorithm) => algorithm.id);
+  const allChecked = categoryIds.every((id) => checkedValues.has(id));
+
+  categoryIds.forEach((id) => {
+    if (allChecked) {
+      checkedValues.delete(id);
+    } else {
+      checkedValues.add(id);
+    }
+  });
+
+  renderTaskAssignmentSelector();
+  taskAssignmentList.querySelectorAll("[data-algorithm-id]").forEach((input) => {
+    input.checked = checkedValues.has(input.dataset.algorithmId);
+  });
+}
+
+
+function moveAlgorithm(id, direction) {
+  const currentIndex = state.algorithms.findIndex((item) => item.id === id);
+  if (currentIndex === -1) {
+    return;
+  }
+
+  const targetIndex = currentIndex + direction;
+  if (targetIndex < 0 || targetIndex >= state.algorithms.length) {
+    return;
+  }
+
+  const nextAlgorithms = [...state.algorithms];
+  [nextAlgorithms[currentIndex], nextAlgorithms[targetIndex]] = [
+    nextAlgorithms[targetIndex],
+    nextAlgorithms[currentIndex]
+  ];
+  state.algorithms = nextAlgorithms;
+  persist();
+  render();
 }
 
 function createFormulaStack(algorithm) {
@@ -742,6 +1043,7 @@ function createFormulaStack(algorithm) {
 function normalizeAlgorithm(item) {
   return {
     ...item,
+    tags: normalizeStatusTags(item.tags),
     visualPattern: normalizePattern(item.visualPattern)
   };
 }
@@ -767,6 +1069,7 @@ function createEmptyState() {
   return {
     algorithms: [],
     tasks: [],
+    categories: [],
     algorithmFilter: "all",
     search: "",
     publishedAt: null
@@ -776,17 +1079,20 @@ function createEmptyState() {
 function serializeState(asPublishedFile) {
   return {
     publishedAt: asPublishedFile ? new Date().toISOString() : state.publishedAt,
+    categories: state.categories,
     algorithms: state.algorithms,
     tasks: state.tasks
   };
 }
 
 function normalizeAppState(data) {
+  const rawAlgorithms = Array.isArray(data.algorithms) ? data.algorithms : seedAlgorithms;
+  const normalizedAlgorithms = rawAlgorithms.map((item) => normalizeAlgorithm(item));
+  const categories = normalizeCategories(data.categories, data.algorithms);
   return {
-    algorithms: Array.isArray(data.algorithms)
-      ? data.algorithms.map(normalizeAlgorithm)
-      : seedAlgorithms.map(normalizeAlgorithm),
+    algorithms: normalizedAlgorithms,
     tasks: Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : [],
+    categories,
     algorithmFilter: state.algorithmFilter || "all",
     search: state.search || "",
     publishedAt: typeof data.publishedAt === "string" ? data.publishedAt : null
@@ -796,9 +1102,13 @@ function normalizeAppState(data) {
 function hydrateState(nextState) {
   state.algorithms = nextState.algorithms;
   state.tasks = nextState.tasks;
+  state.categories = nextState.categories;
   state.algorithmFilter = nextState.algorithmFilter || "all";
   state.search = nextState.search || "";
   state.publishedAt = nextState.publishedAt || null;
+  if (state.algorithmFilter !== "all" && !state.categories.includes(state.algorithmFilter)) {
+    state.algorithmFilter = "all";
+  }
 }
 
 async function loadPublishedState() {
@@ -844,6 +1154,73 @@ function resolveInitialState(localState, publishedState) {
   }
 
   return localState;
+}
+
+function normalizeCategories(categories, algorithms) {
+  const base = Array.isArray(categories) && categories.length ? categories : DEFAULT_CATEGORIES;
+  const algorithmCategories = Array.from(
+    new Set(
+      (Array.isArray(algorithms) ? algorithms : seedAlgorithms)
+        .map((item) => item?.category)
+        .filter(Boolean)
+    )
+  );
+  return Array.from(new Set([...base, ...algorithmCategories]));
+}
+
+function normalizeStatusTags(tags) {
+  const firstTag = Array.isArray(tags) ? tags[0] : tags;
+  if (DEFAULT_CATEGORIES.includes(firstTag)) {
+    return [firstTag];
+  }
+  return ["未学习"];
+}
+
+function renameCategory(oldName, newName) {
+  if (!newName) {
+    window.alert("分类名称不能为空。");
+    return;
+  }
+  if (oldName === newName) {
+    return;
+  }
+  if (state.categories.includes(newName)) {
+    window.alert("这个分类已经存在。");
+    return;
+  }
+
+  state.categories = state.categories.map((category) => (category === oldName ? newName : category));
+  state.algorithms = state.algorithms.map((item) =>
+    item.category === oldName ? { ...item, category: newName } : item
+  );
+  if (state.algorithmFilter === oldName) {
+    state.algorithmFilter = newName;
+  }
+  if (algorithmForm.elements.category.value === oldName) {
+    algorithmForm.elements.category.value = newName;
+  }
+  persist();
+  render();
+}
+
+function deleteCategory(name) {
+  if (DEFAULT_CATEGORIES.includes(name)) {
+    window.alert("默认学习分类需要保留，不能删除。");
+    return;
+  }
+
+  state.categories = state.categories.filter((category) => category !== name);
+  state.algorithms = state.algorithms.map((item) =>
+    item.category === name ? { ...item, category: "未分类" } : item
+  );
+  if (state.algorithmFilter === name) {
+    state.algorithmFilter = "all";
+  }
+  if (algorithmForm.elements.category.value === name) {
+    algorithmForm.elements.category.value = "未分类";
+  }
+  persist();
+  render();
 }
 
 function normalizePattern(pattern) {
@@ -956,6 +1333,11 @@ function formatAssignmentText(task) {
       return `${algorithm?.name || "已删除公式"} x${assignment.repetitions}`;
     })
     .join("，");
+}
+
+function getRepeatSummary(task) {
+  const repeatCount = task.assignments?.[0]?.repetitions || 0;
+  return repeatCount ? `每条练习：${repeatCount} 次` : "每条练习：未设置";
 }
 
 function invertAlgorithm(algorithmText) {
