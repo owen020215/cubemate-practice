@@ -1,17 +1,298 @@
 {
-  "publishedAt": "2026-03-31T02:38:26.928Z",
+  "publishedAt": "2026-03-31T05:54:25.797Z",
   "categories": [
-    "易学会",
-    "基本熟练",
-    "学习中",
-    "未学习"
+    "未分类",
+    "小人马桶",
+    "小人无马桶"
   ],
   "algorithms": [
     {
+      "id": "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+      "name": "小人有马桶，无对，后",
+      "category": "小人马桶",
+      "pattern": "F U然后两次",
+      "algorithm": "F U R U2 R' U' R U2 R' U' F'",
+      "visualPattern": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "学习中"
+      ]
+    },
+    {
+      "id": "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+      "name": "小人有马桶，无对，前",
+      "category": "小人马桶",
+      "pattern": "连色在右。下U然后T",
+      "algorithm": "M U R U R' U' R' F R F' M'",
+      "visualPattern": [
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "学习中"
+      ]
+    },
+    {
+      "id": "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+      "name": "小人有马桶，有一对在前面",
+      "category": "小人马桶",
+      "pattern": "单块放右边",
+      "algorithm": "R' U' R U' R' U2 R F R U R' U' F'",
+      "visualPattern": [
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      ],
+      "tags": [
+        "学习中"
+      ]
+    },
+    {
+      "id": "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+      "name": "小人有马桶，有一对在后面",
+      "category": "小人马桶",
+      "pattern": "单块放右边",
+      "algorithm": "R U R' U R U2 R' F R U R' U' F'",
+      "visualPattern": [
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "学习中"
+      ]
+    },
+    {
+      "id": "331a0d57-2539-415c-8470-e2ac2eff9399",
+      "name": "小人无马桶，无连，左",
+      "category": "小人无马桶",
+      "pattern": "放到小鱼方向，两次公式",
+      "algorithm": "F R U R' U' F' U F R U R' U' F'",
+      "visualPattern": [
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "学习中"
+      ]
+    },
+    {
+      "id": "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+      "name": "小人无马桶，无连，右",
+      "category": "小人无马桶",
+      "pattern": "下，小鱼，U上",
+      "algorithm": "M R U R' U R U2 R' U M'",
+      "visualPattern": [
+        [
+          0,
+          1,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0
+        ]
+      ],
+      "tags": [
+        "学习中"
+      ]
+    },
+    {
       "id": "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
-      "name": "没马桶，连色",
-      "category": "未学习",
-      "pattern": "简单",
+      "name": "小人无马桶，连色，右",
+      "category": "小人无马桶",
+      "pattern": "",
       "algorithm": "r U R' U R U2 r'",
       "visualPattern": [
         [
@@ -51,13 +332,60 @@
         ]
       ],
       "tags": [
-        "简单"
+        "基本熟练"
+      ]
+    },
+    {
+      "id": "25d45322-2d73-4069-b84a-d1b86bc4e2f8",
+      "name": "小人无马桶，连色，左",
+      "category": "小人无马桶",
+      "pattern": "",
+      "algorithm": "l' U' L U' L' U2 l",
+      "visualPattern": [
+        [
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "基本熟练"
       ]
     },
     {
       "id": "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
-      "name": "小鱼 OLL",
-      "category": "未学习",
+      "name": "小鱼1",
+      "category": "未分类",
       "pattern": "顶面只剩一个角朝上，正面看像一条小鱼。",
       "algorithm": "R U R' U R U2 R'",
       "visualPattern": [
@@ -98,14 +426,13 @@
         ]
       ],
       "tags": [
-        "2-look",
-        "初学者"
+        "已学会"
       ]
     },
     {
       "id": "29a70d0b-ea30-44c0-ab57-544ae1815e1a",
       "name": "T OLL",
-      "category": "未学习",
+      "category": "未分类",
       "pattern": "正面像一个 T 形，常用于两步顶层。",
       "algorithm": "R U R' U' R' F R F'",
       "visualPattern": [
@@ -146,35 +473,183 @@
         ]
       ],
       "tags": [
-        "常用",
-        "进阶"
+        "已学会"
       ]
     }
   ],
   "tasks": [
     {
-      "id": "a6a9c266-4c16-46d0-a130-56648d0c66f5",
-      "friendName": "gg",
+      "id": "f733050b-b85a-48a2-ae74-b63552dda842",
+      "friendName": "小人完整练习",
       "date": "2026-03-31",
-      "target": 4,
+      "target": 16,
+      "baseTarget": 16,
       "focus": "",
       "assignments": [
+        {
+          "algorithmId": "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+          "repetitions": 2
+        },
+        {
+          "algorithmId": "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+          "repetitions": 2
+        },
+        {
+          "algorithmId": "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+          "repetitions": 2
+        },
+        {
+          "algorithmId": "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+          "repetitions": 2
+        },
+        {
+          "algorithmId": "331a0d57-2539-415c-8470-e2ac2eff9399",
+          "repetitions": 2
+        },
+        {
+          "algorithmId": "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+          "repetitions": 2
+        },
         {
           "algorithmId": "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
           "repetitions": 2
         },
         {
-          "algorithmId": "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
+          "algorithmId": "25d45322-2d73-4069-b84a-d1b86bc4e2f8",
           "repetitions": 2
         }
       ],
       "queue": [
-        "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
         "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
-        "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc"
+        "25d45322-2d73-4069-b84a-d1b86bc4e2f8",
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+        "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
+        "25d45322-2d73-4069-b84a-d1b86bc4e2f8"
       ],
-      "completed": 1,
-      "needsMore": 1
+      "completedOrder": [],
+      "extraPracticeOrder": [],
+      "completed": 0,
+      "needsMore": 0,
+      "practiceRuns": 0
+    },
+    {
+      "id": "d80ad38b-ce3d-4991-b171-23d1245ccbb7",
+      "friendName": "易混淆小人练习",
+      "date": "2026-03-31",
+      "target": 30,
+      "baseTarget": 30,
+      "focus": "",
+      "assignments": [
+        {
+          "algorithmId": "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+          "repetitions": 5
+        },
+        {
+          "algorithmId": "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+          "repetitions": 5
+        },
+        {
+          "algorithmId": "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+          "repetitions": 5
+        },
+        {
+          "algorithmId": "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+          "repetitions": 5
+        },
+        {
+          "algorithmId": "331a0d57-2539-415c-8470-e2ac2eff9399",
+          "repetitions": 5
+        },
+        {
+          "algorithmId": "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+          "repetitions": 5
+        }
+      ],
+      "queue": [
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+        "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
+        "2e2ea11d-dd09-44c4-b4bf-c7a26a0d8ee5",
+        "51f20234-7e53-4407-a98a-f5e3a3bd380f",
+        "b3834dac-2d02-4dfb-8e0b-9629f445a1e5",
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1"
+      ],
+      "completedOrder": [],
+      "extraPracticeOrder": [],
+      "completed": 0,
+      "needsMore": 0,
+      "practiceRuns": 0
+    },
+    {
+      "id": "3a460303-88b2-4f69-adad-e8fe368bb213",
+      "friendName": "test",
+      "date": "2026-03-31",
+      "target": 4,
+      "baseTarget": 4,
+      "focus": "",
+      "assignments": [
+        {
+          "algorithmId": "331a0d57-2539-415c-8470-e2ac2eff9399",
+          "repetitions": 1
+        },
+        {
+          "algorithmId": "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+          "repetitions": 1
+        },
+        {
+          "algorithmId": "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
+          "repetitions": 1
+        },
+        {
+          "algorithmId": "25d45322-2d73-4069-b84a-d1b86bc4e2f8",
+          "repetitions": 1
+        }
+      ],
+      "queue": [],
+      "completedOrder": [
+        "331a0d57-2539-415c-8470-e2ac2eff9399",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1",
+        "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
+        "25d45322-2d73-4069-b84a-d1b86bc4e2f8"
+      ],
+      "extraPracticeOrder": [],
+      "completed": 4,
+      "needsMore": 0,
+      "practiceRuns": 1
     }
   ]
 }
