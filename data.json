@@ -1,0 +1,81 @@
+{
+  "publishedAt": "2026-03-30T00:00:00.000Z",
+  "algorithms": [
+    {
+      "id": "seed-oll-small-fish",
+      "name": "小鱼 OLL",
+      "category": "OLL",
+      "pattern": "顶面只剩一个角朝上，正面看像一条小鱼。",
+      "algorithm": "R U R' U R U2 R'",
+      "tags": ["2-look", "初学者"],
+      "visualPattern": [
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 1, 1],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0]
+      ]
+    },
+    {
+      "id": "seed-oll-anti-fish",
+      "name": "反小鱼 OLL",
+      "category": "OLL",
+      "pattern": "和小鱼相反方向，常见于顶层定向第二种情况。",
+      "algorithm": "R U2 R' U' R U' R'",
+      "tags": ["2-look", "初学者"],
+      "visualPattern": [
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [1, 1, 1, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 1, 0, 0]
+      ]
+    },
+    {
+      "id": "seed-oll-t",
+      "name": "T OLL",
+      "category": "OLL",
+      "pattern": "正面像一个 T 形，常用于两步顶层。",
+      "algorithm": "r U R' U' r' F R F'",
+      "tags": ["常用", "进阶"],
+      "visualPattern": [
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 1, 0, 0]
+      ]
+    },
+    {
+      "id": "seed-pll-aa",
+      "name": "Aa PLL",
+      "category": "PLL",
+      "pattern": "顶层角块需要三循环，边块已对好。",
+      "algorithm": "x R' U R' D2 R U' R' D2 R2 x'",
+      "tags": ["PLL", "角块"],
+      "visualPattern": [
+        [0, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 0]
+      ]
+    },
+    {
+      "id": "seed-pll-ua",
+      "name": "Ua PLL",
+      "category": "PLL",
+      "pattern": "顶层三条边顺时针循环。",
+      "algorithm": "R U' R U R U R U' R' U' R2",
+      "tags": ["PLL", "边块"],
+      "visualPattern": [
+        [0, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 0]
+      ]
+    }
+  ],
+  "tasks": []
+}

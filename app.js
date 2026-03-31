@@ -1,4 +1,5 @@
 const STORAGE_KEY = "cubemate-data-v1";
+const PUBLISHED_DATA_URL = "./data.json";
 const PATTERN_TEMPLATE = [
   [0, 1, 1, 1, 0],
   [1, 1, 1, 1, 1],
@@ -88,7 +89,7 @@ const seedAlgorithms = [
 
 const today = new Date().toISOString().slice(0, 10);
 
-const state = loadState();
+const state = createEmptyState();
 
 const algorithmList = document.getElementById("algorithmList");
 const taskList = document.getElementById("taskList");
@@ -96,7 +97,9 @@ const algorithmForm = document.getElementById("algorithmForm");
 const taskForm = document.getElementById("taskForm");
 const searchInput = document.getElementById("searchInput");
 const exportButton = document.getElementById("exportButton");
+const publishExportButton = document.getElementById("publishExportButton");
 const importInput = document.getElementById("importInput");
+const restorePublishedButton = document.getElementById("restorePublishedButton");
 const algorithmTemplate = document.getElementById("algorithmCardTemplate");
 const taskTemplate = document.getElementById("taskCardTemplate");
 const patternEditor = document.getElementById("patternEditor");
@@ -121,6 +124,7 @@ let draftPattern = clonePattern(DEFAULT_PATTERN);
 let editingAlgorithmId = null;
 let activePracticeTaskId = null;
 let practiceRevealSolution = false;
+let publishedSnapshot = null;
 
 taskForm.elements.date.value = today;
 buildPatternEditor();
@@ -210,11 +214,21 @@ searchInput.addEventListener("input", (event) => {
 });
 
 exportButton.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify(serializeState(false), null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = `cubemate-backup-${today}.json`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+});
+
+publishExportButton.addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(serializeState(true), null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "data.json";
   anchor.click();
   URL.revokeObjectURL(url);
 });
@@ -234,8 +248,7 @@ importInput.addEventListener("change", async (event) => {
       throw new Error("格式不正确");
     }
 
-    state.algorithms = imported.algorithms.map(normalizeAlgorithm);
-    state.tasks = imported.tasks.map(normalizeTask);
+    hydrateState(normalizeAppState(imported));
     persist();
     render();
     window.alert("导入成功");
@@ -267,46 +280,37 @@ closePracticeButton.addEventListener("click", () => {
   renderPracticePanel();
 });
 
-function loadState() {
+restorePublishedButton.addEventListener("click", () => {
+  if (!publishedSnapshot) {
+    window.alert("当前没有可恢复的线上发布版本。");
+    return;
+  }
+
+  hydrateState(structuredClone(publishedSnapshot));
+  activePracticeTaskId = null;
+  practiceRevealSolution = false;
+  resetAlgorithmForm();
+  persist();
+  render();
+  window.alert("已恢复到当前仓库里的发布版本。");
+});
+
+function loadLocalState() {
   const raw = localStorage.getItem(STORAGE_KEY);
 
   if (!raw) {
-    return {
-      algorithms: seedAlgorithms.map(normalizeAlgorithm),
-      tasks: [],
-      algorithmFilter: "all",
-      search: ""
-    };
+    return null;
   }
 
   try {
-    const parsed = JSON.parse(raw);
-    return {
-      algorithms: Array.isArray(parsed.algorithms)
-        ? parsed.algorithms.map(normalizeAlgorithm)
-        : seedAlgorithms.map(normalizeAlgorithm),
-      tasks: Array.isArray(parsed.tasks) ? parsed.tasks.map(normalizeTask) : [],
-      algorithmFilter: "all",
-      search: ""
-    };
+    return normalizeAppState(JSON.parse(raw));
   } catch {
-    return {
-      algorithms: seedAlgorithms.map(normalizeAlgorithm),
-      tasks: [],
-      algorithmFilter: "all",
-      search: ""
-    };
+    return null;
   }
 }
 
 function persist() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      algorithms: state.algorithms,
-      tasks: state.tasks
-    })
-  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState(false)));
 }
 
 function render() {
@@ -759,6 +763,89 @@ function normalizeTask(task) {
   };
 }
 
+function createEmptyState() {
+  return {
+    algorithms: [],
+    tasks: [],
+    algorithmFilter: "all",
+    search: "",
+    publishedAt: null
+  };
+}
+
+function serializeState(asPublishedFile) {
+  return {
+    publishedAt: asPublishedFile ? new Date().toISOString() : state.publishedAt,
+    algorithms: state.algorithms,
+    tasks: state.tasks
+  };
+}
+
+function normalizeAppState(data) {
+  return {
+    algorithms: Array.isArray(data.algorithms)
+      ? data.algorithms.map(normalizeAlgorithm)
+      : seedAlgorithms.map(normalizeAlgorithm),
+    tasks: Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : [],
+    algorithmFilter: state.algorithmFilter || "all",
+    search: state.search || "",
+    publishedAt: typeof data.publishedAt === "string" ? data.publishedAt : null
+  };
+}
+
+function hydrateState(nextState) {
+  state.algorithms = nextState.algorithms;
+  state.tasks = nextState.tasks;
+  state.algorithmFilter = nextState.algorithmFilter || "all";
+  state.search = nextState.search || "";
+  state.publishedAt = nextState.publishedAt || null;
+}
+
+async function loadPublishedState() {
+  if (!window.location.protocol.startsWith("http")) {
+    return normalizeAppState({
+      algorithms: seedAlgorithms,
+      tasks: []
+    });
+  }
+
+  try {
+    const response = await fetch(PUBLISHED_DATA_URL, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("无法读取发布数据");
+    }
+    return normalizeAppState(await response.json());
+  } catch {
+    return normalizeAppState({
+      algorithms: seedAlgorithms,
+      tasks: []
+    });
+  }
+}
+
+async function initializeApp() {
+  const localState = loadLocalState();
+  const publishedState = await loadPublishedState();
+  publishedSnapshot = structuredClone(publishedState);
+  hydrateState(resolveInitialState(localState, publishedState));
+  render();
+}
+
+function resolveInitialState(localState, publishedState) {
+  if (!localState) {
+    return publishedState;
+  }
+
+  if (
+    publishedState?.publishedAt &&
+    (!localState.publishedAt || new Date(publishedState.publishedAt) > new Date(localState.publishedAt))
+  ) {
+    return publishedState;
+  }
+
+  return localState;
+}
+
 function normalizePattern(pattern) {
   if (!Array.isArray(pattern)) {
     return clonePattern(DEFAULT_PATTERN);
@@ -934,4 +1021,4 @@ function escapeHtml(text) {
     .replaceAll("'", "&#39;");
 }
 
-render();
+initializeApp();

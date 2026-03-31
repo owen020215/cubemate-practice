@@ -7,10 +7,32 @@
 - 给朋友创建每日练习任务
 - 用“完成一把”来做打卡
 - 导出 / 导入 JSON 数据
+- 使用 `data.json` 手动发布最新内容到线上
 
 ## 怎么打开
 
 直接用浏览器打开 `/Users/owensun/Documents/Playground/index.html` 就可以使用。
+
+## 发布数据到线上
+
+现在项目里多了一个 `/Users/owensun/Documents/Playground/data.json`，GitHub Pages 会把它当成线上默认数据源。
+
+推荐流程：
+
+1. 先在本地网页里修改公式、图片、任务
+2. 点击页面里的“导出发布版 data.json”
+3. 用下载下来的文件覆盖仓库里的 `/Users/owensun/Documents/Playground/data.json`
+4. 执行：
+   - `git add data.json`
+   - `git commit -m "Update published data"`
+   - `git push`
+5. 等 GitHub Pages 更新后，朋友打开线上链接就会看到新内容
+
+说明：
+
+- 浏览器本地改动仍然会保存在 `localStorage`
+- 线上默认内容以仓库里的 `data.json` 为准
+- 页面里的“恢复线上发布版本”会把当前浏览器数据恢复到 `data.json` 对应的版本
 
 ## 当前版本特点
 

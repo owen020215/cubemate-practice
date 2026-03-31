@@ -167,13 +167,15 @@
       </div>
       <div class="export-actions">
         <button id="exportButton" class="ghost-button strong">导出数据 JSON</button>
+        <button id="publishExportButton" class="ghost-button strong">导出发布版 data.json</button>
         <label class="import-button">
           导入数据 JSON
           <input id="importInput" type="file" accept="application/json">
         </label>
+        <button id="restorePublishedButton" class="ghost-button">恢复线上发布版本</button>
       </div>
       <p class="hint">
-        这个版本的数据保存在浏览器本地。你可以先导出 JSON 发给朋友，或者后面再升级成真正的线上同步版。
+        这个版本支持两种数据：浏览器本地修改，以及仓库里的发布数据文件 `data.json`。你本地改完后，可以导出发布版文件并替换仓库里的 `data.json`，再 push 到 GitHub。
       </p>
     </section>
 
