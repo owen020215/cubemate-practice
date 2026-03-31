@@ -1,81 +1,174 @@
 {
-  "publishedAt": "2026-03-30T00:00:00.000Z",
+  "publishedAt": "2026-03-31T02:38:26.928Z",
   "algorithms": [
     {
-      "id": "seed-oll-small-fish",
+      "id": "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
+      "name": "没马桶，连色",
+      "category": "OLL",
+      "pattern": "简单",
+      "algorithm": "r U R' U R U2 r'",
+      "visualPattern": [
+        [
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          1,
+          0
+        ]
+      ],
+      "tags": [
+        "简单"
+      ]
+    },
+    {
+      "id": "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
       "name": "小鱼 OLL",
       "category": "OLL",
       "pattern": "顶面只剩一个角朝上，正面看像一条小鱼。",
       "algorithm": "R U R' U R U2 R'",
-      "tags": ["2-look", "初学者"],
       "visualPattern": [
-        [0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0],
-        [0, 0, 1, 1, 1],
-        [0, 1, 1, 1, 0],
-        [0, 0, 1, 0, 0]
+        [
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0
+        ]
+      ],
+      "tags": [
+        "2-look",
+        "初学者"
       ]
     },
     {
-      "id": "seed-oll-anti-fish",
-      "name": "反小鱼 OLL",
-      "category": "OLL",
-      "pattern": "和小鱼相反方向，常见于顶层定向第二种情况。",
-      "algorithm": "R U2 R' U' R U' R'",
-      "tags": ["2-look", "初学者"],
-      "visualPattern": [
-        [0, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0],
-        [1, 1, 1, 0, 0],
-        [0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 0]
-      ]
-    },
-    {
-      "id": "seed-oll-t",
+      "id": "29a70d0b-ea30-44c0-ab57-544ae1815e1a",
       "name": "T OLL",
       "category": "OLL",
       "pattern": "正面像一个 T 形，常用于两步顶层。",
-      "algorithm": "r U R' U' r' F R F'",
-      "tags": ["常用", "进阶"],
+      "algorithm": "R U R' U' R' F R F'",
       "visualPattern": [
-        [0, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0],
-        [0, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0],
-        [0, 0, 1, 0, 0]
-      ]
-    },
-    {
-      "id": "seed-pll-aa",
-      "name": "Aa PLL",
-      "category": "PLL",
-      "pattern": "顶层角块需要三循环，边块已对好。",
-      "algorithm": "x R' U R' D2 R U' R' D2 R2 x'",
-      "tags": ["PLL", "角块"],
-      "visualPattern": [
-        [0, 1, 1, 1, 0],
-        [1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1],
-        [0, 1, 1, 1, 0]
-      ]
-    },
-    {
-      "id": "seed-pll-ua",
-      "name": "Ua PLL",
-      "category": "PLL",
-      "pattern": "顶层三条边顺时针循环。",
-      "algorithm": "R U' R U R U R U' R' U' R2",
-      "tags": ["PLL", "边块"],
-      "visualPattern": [
-        [0, 1, 1, 1, 0],
-        [1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1],
-        [0, 1, 1, 1, 0]
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "常用",
+        "进阶"
       ]
     }
   ],
-  "tasks": []
+  "tasks": [
+    {
+      "id": "a6a9c266-4c16-46d0-a130-56648d0c66f5",
+      "friendName": "gg",
+      "date": "2026-03-31",
+      "target": 4,
+      "focus": "",
+      "assignments": [
+        {
+          "algorithmId": "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
+          "repetitions": 2
+        },
+        {
+          "algorithmId": "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
+          "repetitions": 2
+        }
+      ],
+      "queue": [
+        "8b50efde-6f61-42ab-87b5-58fec5ba1b10",
+        "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
+        "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc"
+      ],
+      "completed": 1,
+      "needsMore": 1
+    }
+  ]
 }
