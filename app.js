@@ -131,6 +131,7 @@ const countNodes = {
 let draftPattern = clonePattern(DEFAULT_PATTERN);
 let editingAlgorithmId = null;
 let activePracticeTaskId = null;
+let practiceRevealDetails = false;
 let publishedSnapshot = null;
 state.activeTab = "practice";
 state.openAssignmentCategories = [];
@@ -213,14 +214,18 @@ taskForm.addEventListener("submit", (event) => {
   const target = assignments.reduce((sum, item) => sum + item.repetitions, 0);
   const task = {
     id: crypto.randomUUID(),
-    friendName: String(formData.get("friendName")).trim(),
+    friendName: String(formData.get("friendName")).trim() || "默认练习",
     date: String(formData.get("date")).trim(),
     target,
+    baseTarget: target,
     focus: String(formData.get("focus")).trim(),
     assignments,
     queue,
+    completedOrder: [],
+    extraPracticeOrder: [],
     completed: 0,
-    needsMore: 0
+    needsMore: 0,
+    practiceRuns: 0
   };
 
   state.tasks.unshift(task);
@@ -312,6 +317,7 @@ restorePublishedButton.addEventListener("click", () => {
 
 closePracticeButton.addEventListener("click", () => {
   activePracticeTaskId = null;
+  practiceRevealDetails = false;
   renderPracticePanel();
 });
 
@@ -530,7 +536,8 @@ function renderTasks() {
     const node = taskTemplate.content.firstElementChild.cloneNode(true);
     const progress = task.target ? Math.min(100, Math.round((task.completed / task.target) * 100)) : 0;
     node.querySelector(".task-name").textContent = task.friendName;
-    node.querySelector(".task-meta").textContent = `${task.date} · 目标 ${task.target} 次`;
+    node.querySelector(".task-meta").textContent =
+      `${task.date} · 目标 ${task.baseTarget || task.target} 次 · 已练习 ${Number(task.practiceRuns || 0)} 轮`;
     node.querySelector(".task-progress-text").textContent = `${task.completed}/${task.target}`;
     node.querySelector(".task-focus").textContent = task.focus
       ? `训练重点：${task.focus}`
@@ -540,7 +547,11 @@ function renderTasks() {
     node.querySelector(".task-assignment-summary").append(renderAssignmentSummary(task));
 
     node.querySelector(".task-practice").addEventListener("click", () => {
+      if (!task.queue?.length) {
+        restartPracticeTask(task.id);
+      }
       activePracticeTaskId = task.id;
+      practiceRevealDetails = false;
       renderPracticePanel();
       practicePanel.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -549,9 +560,18 @@ function renderTasks() {
       state.tasks = state.tasks.filter((entry) => entry.id !== task.id);
       if (activePracticeTaskId === task.id) {
         activePracticeTaskId = null;
+        practiceRevealDetails = false;
       }
       persist();
       render();
+    });
+
+    node.querySelector(".task-sort-up").addEventListener("click", () => {
+      moveTask(task.id, -1);
+    });
+
+    node.querySelector(".task-sort-down").addEventListener("click", () => {
+      moveTask(task.id, 1);
     });
 
     taskList.append(node);
@@ -814,7 +834,7 @@ function renderPracticePanel() {
     practicePanel.classList.add("hidden");
     practiceTitle.textContent = "开始练习";
     practiceMeta.textContent = "";
-    practiceContent.innerHTML = '<div class="empty-state">先从任务进度里点击“开始练习”。</div>';
+    practiceContent.innerHTML = '<div class="empty-state">先从练习内容里点击“开始练习”。</div>';
     return;
   }
 
@@ -824,7 +844,71 @@ function renderPracticePanel() {
   if (!task.queue?.length) {
     practiceTitle.textContent = `${task.friendName} 已完成`;
     practiceMeta.textContent = `${task.date} · 已完成 ${task.completed}/${task.target}`;
-    practiceContent.append(emptyState("这组练习已经全部完成。"));
+    const summary = document.createElement("div");
+    summary.className = "practice-summary";
+
+    const stats = document.createElement("div");
+    stats.className = "practice-summary-stats";
+
+    const completedStat = document.createElement("div");
+    completedStat.className = "practice-summary-stat";
+    completedStat.innerHTML = `<span>完成题目</span><strong>${task.completed}</strong>`;
+
+    const extraStat = document.createElement("div");
+    extraStat.className = "practice-summary-stat";
+    extraStat.innerHTML = `<span>加练题目</span><strong>${task.needsMore}</strong>`;
+
+    stats.append(completedStat, extraStat);
+    summary.append(stats);
+
+    const extraAssignments = collectExtraPracticeAlgorithms(task);
+    if (extraAssignments.length) {
+      const section = document.createElement("section");
+      section.className = "practice-summary-section";
+
+      const heading = document.createElement("h3");
+      heading.className = "practice-summary-title";
+      heading.textContent = "加练公式";
+      section.append(heading);
+
+      const list = document.createElement("div");
+      list.className = "practice-summary-list";
+
+      extraAssignments.forEach(({ algorithm, count }) => {
+        const card = document.createElement("article");
+        card.className = "practice-summary-card";
+
+        const visual = document.createElement("div");
+        visual.className = "practice-summary-visual";
+        visual.append(createPatternElement(algorithm.visualPattern));
+
+        const content = document.createElement("div");
+        content.className = "practice-summary-card-copy";
+
+        const name = document.createElement("h4");
+        name.className = "practice-summary-card-title";
+        name.textContent = algorithm.name;
+
+        const countText = document.createElement("p");
+        countText.className = "practice-summary-card-meta";
+        countText.textContent = `加练 ${count} 次`;
+
+        const formula = document.createElement("code");
+        formula.className = "algorithm-formula practice-summary-formula";
+        formula.textContent = algorithm.algorithm;
+
+        content.append(name, countText, formula);
+        card.append(visual, content);
+        list.append(card);
+      });
+
+      section.append(list);
+      summary.append(section);
+    } else {
+      summary.append(emptyState("这次练习没有额外加练的公式。"));
+    }
+
+    practiceContent.append(summary);
     return;
   }
 
@@ -847,46 +931,69 @@ function renderPracticePanel() {
   face.className = "practice-card-face";
   face.append(createPatternElement(algorithm.visualPattern));
 
-  const name = document.createElement("h3");
-  name.className = "practice-name";
-  name.textContent = algorithm.name;
-  face.append(name);
-
   const scramble = document.createElement("code");
   scramble.className = "algorithm-formula practice-algorithm";
   scramble.textContent = `打乱公式：${invertAlgorithm(algorithm.algorithm)}`;
   face.append(scramble);
 
-  const formula = document.createElement("code");
-  formula.className = "algorithm-formula practice-algorithm";
-  formula.textContent = `公式：${algorithm.algorithm}`;
-  face.append(formula);
+  if (practiceRevealDetails) {
+    const name = document.createElement("h3");
+    name.className = "practice-name";
+    name.textContent = algorithm.name;
+    face.append(name);
 
-  if (algorithm.pattern) {
-    const note = document.createElement("p");
-    note.className = "practice-note";
-    note.textContent = `备注：${algorithm.pattern}`;
-    face.append(note);
+    const formula = document.createElement("code");
+    formula.className = "algorithm-formula practice-algorithm";
+    formula.textContent = `公式：${algorithm.algorithm}`;
+    face.append(formula);
+
+    if (algorithm.pattern) {
+      const note = document.createElement("p");
+      note.className = "practice-note";
+      note.textContent = `备注：${algorithm.pattern}`;
+      face.append(note);
+    }
   }
 
   const actions = document.createElement("div");
   actions.className = "practice-actions";
+
+  const revealButton = document.createElement("button");
+  revealButton.type = "button";
+  revealButton.className = "ghost-button";
+  revealButton.textContent = practiceRevealDetails ? "已显示公式" : "显示公式";
+  revealButton.disabled = practiceRevealDetails;
+  revealButton.addEventListener("click", () => {
+    practiceRevealDetails = true;
+    renderPracticePanel();
+  });
 
   const nextButton = document.createElement("button");
   nextButton.type = "button";
   nextButton.className = "primary-button";
   nextButton.textContent = "下一题";
   nextButton.addEventListener("click", () => {
-    goToNextPracticeCard();
+    goToNextPracticeCard({ addExtra: false });
   });
 
-  actions.append(nextButton);
+  actions.append(revealButton, nextButton);
+
+  if (practiceRevealDetails) {
+    const retryButton = document.createElement("button");
+    retryButton.type = "button";
+    retryButton.className = "ghost-button strong";
+    retryButton.textContent = "加入加练并进入下一题";
+    retryButton.addEventListener("click", () => {
+      goToNextPracticeCard({ addExtra: true });
+    });
+    actions.append(retryButton);
+  }
 
   stage.append(face, actions);
   practiceContent.append(stage);
 }
 
-function goToNextPracticeCard() {
+function goToNextPracticeCard({ addExtra }) {
   if (!activePracticeTaskId) {
     return;
   }
@@ -902,14 +1009,31 @@ function goToNextPracticeCard() {
     }
 
     const completedAlgorithmId = queue.shift();
+    if (addExtra) {
+      queue.push(completedAlgorithmId);
+    }
     promoteNextDifferent(queue, completedAlgorithmId);
+    const nextCompleted = Number(task.completed || 0) + 1;
+    const nextNeedsMore = Number(task.needsMore || 0) + (addExtra ? 1 : 0);
+    const nextTarget = Number(task.target || 0) + (addExtra ? 1 : 0);
+    const isRoundCompleted = queue.length === 0;
     return {
       ...task,
       queue,
-      completed: Number(task.completed || 0) + 1
+      completedOrder: [...(Array.isArray(task.completedOrder) ? task.completedOrder : []), completedAlgorithmId],
+      extraPracticeOrder: addExtra
+        ? [...(Array.isArray(task.extraPracticeOrder) ? task.extraPracticeOrder : []), completedAlgorithmId]
+        : Array.isArray(task.extraPracticeOrder)
+          ? task.extraPracticeOrder
+          : [],
+      target: nextTarget,
+      completed: nextCompleted,
+      needsMore: nextNeedsMore,
+      practiceRuns: Number(task.practiceRuns || 0) + (isRoundCompleted ? 1 : 0)
     };
   });
 
+  practiceRevealDetails = false;
   persist();
   renderTasks();
   renderPracticePanel();
@@ -936,6 +1060,77 @@ function buildPracticeQueue(assignments) {
   }
 
   return queue;
+}
+
+function restartPracticeTask(taskId) {
+  state.tasks = state.tasks.map((task) => {
+    if (task.id !== taskId) {
+      return task;
+    }
+
+    const assignments = Array.isArray(task.assignments) ? task.assignments : [];
+    const baseTarget =
+      typeof task.baseTarget === "number" && Number.isFinite(task.baseTarget)
+        ? task.baseTarget
+        : assignments.reduce((sum, item) => sum + Number(item.repetitions || 0), 0);
+
+    return {
+      ...task,
+      queue: buildPracticeQueue(assignments),
+      target: baseTarget,
+      baseTarget,
+      completed: 0,
+      needsMore: 0,
+      completedOrder: [],
+      extraPracticeOrder: []
+    };
+  });
+
+  persist();
+}
+
+function collectExtraPracticeAlgorithms(task) {
+  const extraCountById = new Map();
+  const assignments = Array.isArray(task.assignments) ? task.assignments : [];
+  const queueLength = Array.isArray(task.queue) ? task.queue.length : 0;
+
+  assignments.forEach((assignment) => {
+    const baseRepetitions = Number(assignment.repetitions || 0);
+    const completedCount = countOccurrences(task.completedOrder, assignment.algorithmId);
+    const queuedCount = countOccurrences(task.queue, assignment.algorithmId);
+    const extraCount = Math.max(0, completedCount + queuedCount - baseRepetitions);
+
+    if (extraCount > 0) {
+      extraCountById.set(assignment.algorithmId, extraCount);
+    }
+  });
+
+  if (!extraCountById.size && Number(task.needsMore || 0) > 0 && queueLength === 0) {
+    const fallbackCounts = new Map();
+    (task.extraPracticeOrder || []).forEach((algorithmId) => {
+      fallbackCounts.set(algorithmId, (fallbackCounts.get(algorithmId) || 0) + 1);
+    });
+    fallbackCounts.forEach((count, algorithmId) => {
+      if (count > 0) {
+        extraCountById.set(algorithmId, count);
+      }
+    });
+  }
+
+  return Array.from(extraCountById.entries())
+    .map(([algorithmId, count]) => ({
+      algorithm: state.algorithms.find((item) => item.id === algorithmId),
+      count
+    }))
+    .filter((item) => item.algorithm);
+}
+
+function countOccurrences(list, target) {
+  if (!Array.isArray(list) || !target) {
+    return 0;
+  }
+
+  return list.reduce((count, item) => count + (item === target ? 1 : 0), 0);
 }
 
 function promoteNextDifferent(queue, previousAlgorithmId) {
@@ -1012,6 +1207,27 @@ function moveAlgorithm(id, direction) {
   render();
 }
 
+function moveTask(id, direction) {
+  const currentIndex = state.tasks.findIndex((item) => item.id === id);
+  if (currentIndex === -1) {
+    return;
+  }
+
+  const targetIndex = currentIndex + direction;
+  if (targetIndex < 0 || targetIndex >= state.tasks.length) {
+    return;
+  }
+
+  const nextTasks = [...state.tasks];
+  [nextTasks[currentIndex], nextTasks[targetIndex]] = [
+    nextTasks[targetIndex],
+    nextTasks[currentIndex]
+  ];
+  state.tasks = nextTasks;
+  persist();
+  renderTasks();
+}
+
 function createFormulaStack(algorithm) {
   const wrap = document.createElement("div");
   wrap.className = "formula-stack";
@@ -1050,18 +1266,26 @@ function normalizeAlgorithm(item) {
 
 function normalizeTask(task) {
   const assignments = Array.isArray(task.assignments) ? task.assignments : [];
+  const baseTarget =
+    typeof task.baseTarget === "number" && Number.isFinite(task.baseTarget)
+      ? task.baseTarget
+      : assignments.reduce((sum, item) => sum + Number(item.repetitions || 0), 0);
   const target =
     typeof task.target === "number" && Number.isFinite(task.target)
       ? task.target
-      : assignments.reduce((sum, item) => sum + Number(item.repetitions || 0), 0);
+      : baseTarget;
 
   return {
     ...task,
+    baseTarget,
     target,
     assignments,
     queue: Array.isArray(task.queue) ? task.queue : [],
+    completedOrder: Array.isArray(task.completedOrder) ? task.completedOrder : [],
+    extraPracticeOrder: Array.isArray(task.extraPracticeOrder) ? task.extraPracticeOrder : [],
     completed: Number(task.completed || 0),
-    needsMore: Number(task.needsMore || 0)
+    needsMore: Number(task.needsMore || 0),
+    practiceRuns: Number(task.practiceRuns || 0)
   };
 }
 

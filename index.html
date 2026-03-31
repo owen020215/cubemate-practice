@@ -122,7 +122,7 @@
           <form id="taskForm" class="stack-form">
             <label>
               练习名
-              <input name="friendName" required placeholder="">
+              <input name="friendName" placeholder="">
             </label>
             <label>
               日期
@@ -152,11 +152,25 @@
           <div class="panel-head">
             <div>
               <p class="section-kicker">打卡区</p>
-              <h2>任务进度</h2>
+              <h2>练习内容</h2>
             </div>
           </div>
           <div id="taskList" class="task-list"></div>
         </article>
+      </section>
+
+      <section id="practicePanel" class="panel practice-panel hidden">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">练习区域</p>
+            <h2 id="practiceTitle">开始练习</h2>
+            <p id="practiceMeta" class="hint"></p>
+          </div>
+          <button id="closePracticeButton" type="button" class="ghost-button">关闭练习</button>
+        </div>
+        <div id="practiceContent" class="practice-content">
+          <div class="empty-state">先从练习内容里点击“开始练习”。</div>
+        </div>
       </section>
 
       <section class="panel export-panel">
@@ -174,20 +188,6 @@
             <input id="importInput" type="file" accept="application/json">
           </label>
           <button id="restorePublishedButton" class="ghost-button">恢复线上发布版本</button>
-        </div>
-      </section>
-
-      <section id="practicePanel" class="panel practice-panel hidden">
-        <div class="panel-head">
-          <div>
-            <p class="section-kicker">练习区域</p>
-            <h2 id="practiceTitle">开始练习</h2>
-            <p id="practiceMeta" class="hint"></p>
-          </div>
-          <button id="closePracticeButton" type="button" class="ghost-button">关闭练习</button>
-        </div>
-        <div id="practiceContent" class="practice-content">
-          <div class="empty-state">先从任务进度里点击“开始练习”。</div>
         </div>
       </section>
     </section>
@@ -235,6 +235,10 @@
       <div class="task-actions">
         <button class="primary-button task-practice">开始练习</button>
         <button class="danger-link task-delete">删除</button>
+      </div>
+      <div class="sort-controls">
+        <button class="sort-arrow task-sort-up" aria-label="上移练习">↑</button>
+        <button class="sort-arrow task-sort-down" aria-label="下移练习">↓</button>
       </div>
     </article>
   </template>

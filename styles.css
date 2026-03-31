@@ -732,6 +732,10 @@ button:hover,
   position: relative;
 }
 
+.task-card {
+  position: relative;
+}
+
 .sort-controls {
   position: absolute;
   right: 18px;
@@ -949,6 +953,98 @@ button:hover,
 .practice-note {
   color: var(--muted);
   line-height: 1.7;
+}
+
+.practice-summary {
+  display: grid;
+  gap: 18px;
+}
+
+.practice-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.practice-summary-stat {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 240, 228, 0.92));
+  border: 1px solid rgba(30, 27, 22, 0.06);
+}
+
+.practice-summary-stat span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.practice-summary-stat strong {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.practice-summary-section {
+  display: grid;
+  gap: 14px;
+}
+
+.practice-summary-title {
+  font-size: 20px;
+}
+
+.practice-summary-list {
+  display: grid;
+  gap: 12px;
+}
+
+.practice-summary-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(30, 27, 22, 0.06);
+}
+
+.practice-summary-visual {
+  width: 120px;
+  min-width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.practice-summary-visual .cube-pattern {
+  transform: scale(0.78);
+  transform-origin: center center;
+}
+
+.practice-summary-card-copy {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.practice-summary-card-title {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.practice-summary-card-meta {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.practice-summary-formula {
+  margin: 0;
 }
 
 .hint {
