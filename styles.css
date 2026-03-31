@@ -1126,4 +1126,25 @@ button:hover,
   .hero-signature {
     font-size: 16px;
   }
+
+  .task-list-panel {
+    order: 1;
+  }
+
+  .task-builder-panel {
+    order: 2;
+  }
+
+  input,
+  textarea,
+  select {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  input[type="date"] {
+    width: 100%;
+    min-width: 0;
+    padding-right: 12px;
+  }
 }
