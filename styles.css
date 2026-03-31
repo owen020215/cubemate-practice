@@ -547,8 +547,29 @@ button:hover,
   box-shadow: 0 10px 22px rgba(93, 59, 20, 0.05);
 }
 
+.assignment-chip-visual {
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  padding: 6px;
+  overflow: hidden;
+}
+
+.assignment-chip-visual .cube-pattern {
+  transform: translate(-17px, 2px) scale(0.43);
+  transform-origin: center center;
+  margin: 0;
+}
+
 .task-assignment-summary {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.task-assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
 }
 
 .task-assignment-details {

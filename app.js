@@ -807,14 +807,23 @@ function createPatternElement(pattern) {
 
 function renderAssignmentSummary(task) {
   const wrap = document.createElement("div");
+  wrap.className = "task-assignment-grid";
   const assignments = Array.isArray(task.assignments) ? task.assignments : [];
 
   assignments.forEach((assignment) => {
     const algorithm = state.algorithms.find((item) => item.id === assignment.algorithmId);
-    const chip = document.createElement("span");
-    chip.className = "assignment-chip";
-    chip.textContent = `${algorithm?.name || "已删除公式"}`;
-    wrap.append(chip);
+    const preview = document.createElement("div");
+    preview.className = "assignment-chip assignment-chip-visual";
+
+    if (algorithm) {
+      preview.append(createPatternElement(algorithm.visualPattern));
+      preview.setAttribute("aria-label", algorithm.name);
+      preview.title = algorithm.name;
+    } else {
+      preview.textContent = "已删除";
+    }
+
+    wrap.append(preview);
   });
 
   if (task.needsMore) {
