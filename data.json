@@ -1,11 +1,106 @@
 {
-  "publishedAt": "2026-03-31T05:54:25.797Z",
+  "publishedAt": "2026-04-03T06:10:49.736Z",
   "categories": [
     "未分类",
     "小人马桶",
-    "小人无马桶"
+    "小人无马桶",
+    "C"
   ],
   "algorithms": [
+    {
+      "id": "821a8d1a-e6cf-4327-989e-4e3858d98227",
+      "name": "C无连色",
+      "category": "C",
+      "pattern": "T+小鱼",
+      "algorithm": "R U R' U' R' F R F' R' U2 R U R' U R",
+      "visualPattern": [
+        [
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "未学习"
+      ]
+    },
+    {
+      "id": "d4b3a732-6ae7-4b2f-b43e-c7c7f886b98d",
+      "name": "C连色",
+      "category": "C",
+      "pattern": "",
+      "algorithm": "R' U' R' F R F' U R",
+      "visualPattern": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "tags": [
+        "未学习"
+      ]
+    },
     {
       "id": "0327b8a7-c38d-450b-bbf9-b1c641fd2567",
       "name": "小人有马桶，无对，后",
@@ -618,7 +713,7 @@
       "id": "3a460303-88b2-4f69-adad-e8fe368bb213",
       "friendName": "test",
       "date": "2026-03-31",
-      "target": 4,
+      "target": 5,
       "baseTarget": 4,
       "focus": "",
       "assignments": [
@@ -644,12 +739,15 @@
         "331a0d57-2539-415c-8470-e2ac2eff9399",
         "09de40ab-a2db-4dc3-9f60-9474c36051b1",
         "17688b7d-f1c9-4cc2-8f6d-da61b69a9bfc",
-        "25d45322-2d73-4069-b84a-d1b86bc4e2f8"
+        "25d45322-2d73-4069-b84a-d1b86bc4e2f8",
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1"
       ],
-      "extraPracticeOrder": [],
-      "completed": 4,
-      "needsMore": 0,
-      "practiceRuns": 1
+      "extraPracticeOrder": [
+        "09de40ab-a2db-4dc3-9f60-9474c36051b1"
+      ],
+      "completed": 5,
+      "needsMore": 1,
+      "practiceRuns": 2
     }
   ]
 }
